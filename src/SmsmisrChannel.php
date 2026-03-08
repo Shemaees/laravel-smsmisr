@@ -2,32 +2,38 @@
 
 namespace Ghanem\LaravelSmsmisr;
 
+use Ghanem\LaravelSmsmisr\Exceptions\SmsmisrException;
 use Illuminate\Notifications\Notification;
 
 class SmsmisrChannel
 {
-    /** @var Smsmisr $client */
-    protected $client;
-
-    public function __construct(Smsmisr $client)
+    public function __construct(protected Smsmisr $client)
     {
-        $this->client = $client;
     }
 
-    public function send($notifiable, Notification $notification): bool
+    /**
+     * Send the given notification.
+     *
+     * @throws SmsmisrException
+     */
+    public function send(mixed $notifiable, Notification $notification): SmsmisrResponse
     {
         $message = $notification->toSmsmisr($notifiable);
 
-        try {
-            $response = $this->client->send($message->message, $message->to, $message->sender);
-
-            if ($response['Code'] == 1901) {
-                return true;
-            }
-        } catch (\Exception $e) {
-            unset($e);
+        if ($message->isVerification()) {
+            return $this->client->sendVerify(
+                $message->getVerificationCode(),
+                $message->getTo(),
+                $message->getSender(),
+                $message->getTemplate(),
+            );
         }
 
-        return false;
+        return $this->client->send(
+            $message->getMessage(),
+            $message->getTo(),
+            $message->getSender(),
+            scheduledAt: $message->getScheduledAt(),
+        );
     }
 }

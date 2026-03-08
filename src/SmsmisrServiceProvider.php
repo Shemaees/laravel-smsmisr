@@ -2,51 +2,43 @@
 
 namespace Ghanem\LaravelSmsmisr;
 
-use Ghanem\LaravelSmsmisr\Smsmisr;
-use \Illuminate\Support\ServiceProvider;
+use Ghanem\LaravelSmsmisr\Commands\BalanceCommand;
+use Ghanem\LaravelSmsmisr\Commands\CheckBalanceCommand;
+use Illuminate\Support\ServiceProvider;
 
 class SmsmisrServiceProvider extends ServiceProvider
 {
-    /**
-     * @var bool $defer Indicates if loading of the provider is deferred.
-     */
-    protected $defer = false;
-
-
-    public function boot()
+    public function boot(): void
     {
-        $this->publishes([$this->configPath() => config_path('smsmisr.php')]);
+        $this->publishes([
+            $this->configPath() => config_path('smsmisr.php'),
+        ], 'smsmisr-config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                BalanceCommand::class,
+                CheckBalanceCommand::class,
+            ]);
+        }
     }
 
-    public function register()
+    public function register(): void
     {
-        $this->mergeConfigFrom($this->configPath(), 'config');
+        $this->mergeConfigFrom($this->configPath(), 'smsmisr');
 
-        $this->app->singleton('smsmisr', function($app) {
-            return new Smsmisr();
-        });
-
-        $this->app->bind('smsmisr', function($app) {
+        $this->app->singleton('smsmisr', function () {
             return new Smsmisr();
         });
 
         $this->app->alias('smsmisr', Smsmisr::class);
     }
 
-
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
+    public function provides(): array
     {
-        return array('smsmisr', Smsmisr::class);
+        return ['smsmisr', Smsmisr::class];
     }
 
-
-    protected function configPath()
+    protected function configPath(): string
     {
         return __DIR__ . '/../config/smsmisr.php';
     }

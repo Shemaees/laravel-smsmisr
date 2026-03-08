@@ -1,21 +1,30 @@
 {
 	"name": "ghanem/laravel-smsmisr",
-	"description": "Send SMS and SMS Notification via sms misr for Laravel",
-	"keywords": ["laravel", "laravel5", "sms", "api", "smsmisr", "notification", "channel"],
+	"description": "Send SMS and SMS Notification via SMS Misr for Laravel",
+	"keywords": ["laravel", "sms", "api", "smsmisr", "notification", "channel", "egypt"],
 	"license": "MIT",
 	"authors": [{
-		"name": "ِAbdullah Ghanem",
+		"name": "Abdullah Ghanem",
 		"email": "3bdullah.ghanem@gmail.com"
 	}],
 	"require": {
-		"php": "^8.0",
-		"illuminate/support": ">=5.3",
-		"symfony/psr-http-message-bridge": "^2.0",
-		"guzzlehttp/guzzle": "^7.0"
+		"php": "^8.1",
+		"illuminate/http": "^10.0|^11.0|^12.0",
+		"illuminate/notifications": "^10.0|^11.0|^12.0",
+		"illuminate/support": "^10.0|^11.0|^12.0"
+	},
+	"require-dev": {
+		"orchestra/testbench": "^8.0|^9.0|^10.0",
+		"phpunit/phpunit": "^10.0|^11.0"
 	},
 	"autoload": {
 		"psr-4": {
 			"Ghanem\\LaravelSmsmisr\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Ghanem\\LaravelSmsmisr\\Tests\\": "tests/"
 		}
 	},
 	"extra": {
@@ -24,9 +33,16 @@
 				"Ghanem\\LaravelSmsmisr\\SmsmisrServiceProvider"
 			],
 			"aliases": {
-				"Smsmisr": "Ghanem\\LaravelSmsmisr\\Smsmisr"
+				"Smsmisr": "Ghanem\\LaravelSmsmisr\\Facades\\Smsmisr"
 			}
 		}
 	},
-	"prefer-stable": true
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+	"scripts": {
+		"test": "vendor/bin/phpunit"
+	},
+	"config": {
+		"sort-packages": true
+	}
 }
